@@ -12,7 +12,11 @@
 <!-- ========================= SECTION PAGETOP ========================= -->
 <section class="section-pagetop bg">
   <div class="container">
+    {% if 'search' in request.path %}
+    <h2 class="title-page">Search Result</h2>
+    {% else %}
     <h2 class="title-page">Our Store</h2>
+    {% endif %}
   </div>
   <!-- container //  -->
 </section>
@@ -160,6 +164,9 @@
         <!-- sect-heading -->
 
         <div class="row">
+          <!-- if any product is found then -->
+          {% if products %}
+          <!-- Looping through the products -->
           {% for product in products %}
           <div class="col-md-4">
             <figure class="card card-product-grid">
@@ -180,27 +187,78 @@
                   </div>
                   <!-- price-wrap.// -->
                 </div>
-                <a href="#" class="btn btn-block btn-primary">Add to cart </a>
+                <a
+                  href="{{ product.get_url }}"
+                  class="btn btn-block btn-primary"
+                  >View Details
+                </a>
               </figcaption>
             </figure>
           </div>
           {% endfor %}
+          <!-- if no product is not found -->
+          {% else %}
+          <div>
+            <h2>No result found. Try again.</h2>
+          </div>
+          {% endif %}
           <!-- col.// -->
         </div>
         <!-- row end.// -->
 
         <nav class="mt-4" aria-label="Page navigation sample">
+          <!-- If we have more than one pages then only showing the pagination -->
+          {% if products.has_other_pages %}
           <ul class="pagination">
+            <!-- Previous page button logic -->
+            {% if products.has_previous %}
+            <!-- if there is previous page then show button and link for previous page -->
+            <li class="page-item">
+              <a
+                class="page-link"
+                href="?page={{ products.previous_page_number }}"
+                >Previous</a
+              >
+            </li>
+            <!-- if there is no previous page then disable button -->
+            {% else %}
             <li class="page-item disabled">
               <a class="page-link" href="#">Previous</a>
             </li>
+            {% endif %}
+
+            <!-- Page number buttons logic -->
+            {% for i in products.paginator.page_range %}
+            <!-- if the current page then show as active and link will be none -->
+            {% if products.number == i %}
             <li class="page-item active">
-              <a class="page-link" href="#">1</a>
+              <a class="page-link" href="#">{{ i }}</a>
             </li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+            <!-- if any other page then show page number with their respective links -->
+            {% else %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{i}}">{{ i }}</a>
+            </li>
+            {% endif %}
+            <!-- end of for loop -->
+            {% endfor %}
+
+            <!-- next page button logic -->
+            {% if products.has_next %}
+            <!-- if there is next page then show button and link for next page -->
+            <li class="page-item">
+              <a class="page-link" href="?page={{ products.next_page_number }}"
+                >Next</a
+              >
+            </li>
+            {% else %}
+            <!-- if there is no next page then disable button -->
+            <li class="page-item disabled">
+              <a class="page-link" href="#">Next</a>
+            </li>
+            {% endif %}
           </ul>
+          {% endif %}
         </nav>
       </main>
       <!-- col.// -->
