@@ -149,9 +149,19 @@ MESSAGE_TAGS = {
 }
 
 
-# SMTP Configuration
+# GMAIL SMTP Configuration
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'supratim.chakraborty.kdnl@gmail.com'
-EMAIL_HOST_PASSWORD = 'evxqqstzopghhyrq'
+EMAIL_HOST_PASSWORD = 'create_app_password_here'
+
+
+# OUTLOOK SMTP Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.office365.com'  # Microsoft's SMTP server
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'evilboy00@outlook.com'  # Your Microsoft 365 email
+EMAIL_HOST_PASSWORD = 'password_here'  # Your Microsoft 365 email password
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
