@@ -149,12 +149,12 @@ MESSAGE_TAGS = {
 }
 
 
-# GMAIL SMTP Configuration
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'supratim.chakraborty.kdnl@gmail.com'
-EMAIL_HOST_PASSWORD = 'create_app_password_here'
+# # GMAIL SMTP Configuration
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_USE_TLS = True
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = 'supratim.chakraborty.kdnl@gmail.com'
+# EMAIL_HOST_PASSWORD = 'create_app_password_here'
 
 
 # OUTLOOK SMTP Configuration
@@ -163,5 +163,5 @@ EMAIL_HOST = 'smtp.office365.com'  # Microsoft's SMTP server
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'evilboy00@outlook.com'  # Your Microsoft 365 email
-EMAIL_HOST_PASSWORD = 'password_here'  # Your Microsoft 365 email password
+EMAIL_HOST_PASSWORD = 'Free@2023#'  # Your Microsoft 365 email password
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

@@ -13,6 +13,9 @@ from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
 
+from carts.models import Cart, CartItem
+from carts.views import _cart_id
+
 # Create your views here.
 
 
@@ -75,6 +78,23 @@ def login(request):
         user = auth.authenticate(email=email, password=password)
 
         if user is not None:
+            try:
+                # getting the cart
+                cart = Cart.objects.get(cart_id = _cart_id(request))
+                # checking is the cart item exists or not
+                is_cart_item_exists = CartItem.objects.filter(cart=cart).exists()
+
+                if is_cart_item_exists:
+                    # getting the cart item
+                    cart_item = CartItem.objects.filter(cart = cart)
+
+                    # assigning the user to all the cart item
+                    for item in cart_item:
+                        item.user = user
+                        item.save()
+            except:
+                pass
+
             auth.login(request, user)
             messages.success(request, 'Logged in Successfully')
             return redirect('dashboard')

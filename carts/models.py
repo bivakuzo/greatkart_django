@@ -1,5 +1,6 @@
 from django.db import models
 from store.models import Product, Variation
+from accounts.models import Account
 
 # Create your models here.
 class Cart(models.Model):
@@ -10,10 +11,12 @@ class Cart(models.Model):
         return self.cart_id
     
 class CartItem(models.Model):
+    # for storing cart items to the user after logging in
+    user = models.ForeignKey(Account, on_delete = models.CASCADE, null = True)
     product = models.ForeignKey(Product, on_delete = models.CASCADE)
     # Many-To-Many Relationship : Multiple records in a table are associated with multiple records in another table.
     variations = models.ManyToManyField(Variation, blank = True)    
-    cart = models.ForeignKey(Cart, on_delete = models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete = models.CASCADE, null = True)
     quantity = models.IntegerField()
     is_active = models.BooleanField(default = True)
 
