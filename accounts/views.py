@@ -1,9 +1,10 @@
 from django.shortcuts import redirect, render
+import requests.utils
 from .forms import RegistrationForm
 from .models import Account
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+# from django.http import HttpResponse
 
 # Verification email imports
 from django.contrib.sites.shortcuts import get_current_site
@@ -15,6 +16,8 @@ from django.core.mail import EmailMessage
 
 from carts.models import Cart, CartItem
 from carts.views import _cart_id
+
+import requests
 
 # Create your views here.
 
@@ -80,24 +83,72 @@ def login(request):
         if user is not None:
             try:
                 # getting the cart
-                cart = Cart.objects.get(cart_id = _cart_id(request))
+                cart = Cart.objects.get(cart_id=_cart_id(request))
+
                 # checking is the cart item exists or not
                 is_cart_item_exists = CartItem.objects.filter(cart=cart).exists()
 
                 if is_cart_item_exists:
                     # getting the cart item
-                    cart_item = CartItem.objects.filter(cart = cart)
+                    cart_item = CartItem.objects.filter(cart=cart)
 
-                    # assigning the user to all the cart item
+                    # getting the current product variations by cart id
+                    product_variation = []
                     for item in cart_item:
-                        item.user = user
-                        item.save()
+                        variation = item.variations.all()
+                        product_variation.append(list(variation))
+
+                    # getting the cart items from the user to access his existing product variations
+                    cart_item = CartItem.objects.filter(user=user)
+                    ex_var_list = []
+                    id = []
+                    for item in cart_item:
+                        existing_variation = item.variations.all()
+                        ex_var_list.append(list(existing_variation))
+                        id.append(item.id)
+
+                    for prod_var in product_variation:
+                        # increasing the product variation count if item already exists
+                        if prod_var in ex_var_list:
+                            index = ex_var_list.index(prod_var)
+                            item_id = id[index]
+                            item = CartItem.objects.get(id=item_id)
+                            item.quantity += 1
+                            item.user = user
+                            item.save()
+                        # if item does not exists then add the item
+                        else:
+                            cart_item = CartItem.objects.filter(cart=cart)
+                            # assigning the user to all the cart item
+                            for item in cart_item:
+                                item.user = user
+                                item.save()
+                                
             except:
                 pass
 
             auth.login(request, user)
             messages.success(request, 'Logged in Successfully')
-            return redirect('dashboard')
+
+            # getting the full url using the get method
+            url = request.META.get('HTTP_REFERER')
+            # http://127.0.0.1:8000/accounts/login/  OR, http://127.0.0.1:8000/accounts/login/?next=/cart/checkout/
+
+            try:
+                # taking only the part that is after '?' here, 'next=/cart/checkout/'
+                query = requests.utils.urlparse(url).query
+                # next=/cart/checkout/
+                
+                # making the url into a dictionary so that we can use it further
+                params = dict(x.split('=') for x in query.split('&'))   
+                # {'next': '/cart/checkout/'}
+
+                if 'next' in params:
+                    nextpage = params['next']
+                    return redirect(nextpage)
+
+            except:
+                return redirect('dashboard')
         else:
             messages.error(request, 'Invalid Credentials')
             return redirect('login')
